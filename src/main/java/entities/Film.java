@@ -2,8 +2,6 @@ package entities;
 
 import jakarta.persistence.*;
 
-
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,10 +14,10 @@ public class Film {
     private String nom;
     private int annee;
     private double rating;
-    
+
     @Column(name = "URL")
     private String url;
-    
+
     @Column(length = 1024)
     private String resume;
 
@@ -39,165 +37,97 @@ public class Film {
     @JoinTable(name = "Film_Genre", joinColumns = @JoinColumn(name = "FILM_ID"), inverseJoinColumns = @JoinColumn(name = "GENRE_ID"))
     private Set<Genre> genres = new HashSet<>();
 
-    // Constructor without arguments
+    // Constructeur sans arguments
     public Film() {}
 
-	/**
-	 * @return the idImdb
-	 */
-	public String getIdImdb() {
-		return idImdb;
-	}
+    // Getters et setters
+    public String getIdImdb() {
+        return idImdb;
+    }
 
-	/**
-	 * @return the nom
-	 */
-	public String getNom() {
-		return nom;
-	}
+    public void setIdImdb(String idImdb) {
+        this.idImdb = idImdb;
+    }
 
-	/**
-	 * @return the annee
-	 */
-	public int getAnnee() {
-		return annee;
-	}
+    public String getNom() {
+        return nom;
+    }
 
-	/**
-	 * @return the rating
-	 */
-	public double getRating() {
-		return rating;
-	}
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
 
-	/**
-	 * @return the url
-	 */
-	public String getUrl() {
-		return url;
-	}
+    public int getAnnee() {
+        return annee;
+    }
 
-	/**
-	 * @return the resume
-	 */
-	public String getResume() {
-		return resume;
-	}
+    public void setAnnee(int annee) {
+        this.annee = annee;
+    }
 
-	/**
-	 * @return the lieuTournage
-	 */
-	public Lieu getLieuTournage() {
-		return lieuTournage;
-	}
+    public double getRating() {
+        return rating;
+    }
 
-	/**
-	 * @return the pays
-	 */
-	public Pays getPays() {
-		return pays;
-	}
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
 
-	/**
-	 * @return the langue
-	 */
-	public Langue getLangue() {
-		return langue;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	/**
-	 * @return the genres
-	 */
-	public Set<Genre> getGenres() {
-		return genres;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	/**
-	 * @param idImdb the idImdb to set
-	 */
-	public void setIdImdb(String idImdb) {
-		this.idImdb = idImdb;
-	}
+    public String getResume() {
+        return resume;
+    }
 
-	/**
-	 * @param nom the nom to set
-	 */
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
+    public void setResume(String resume) {
+        this.resume = resume;
+    }
 
-	/**
-	 * @param annee the annee to set
-	 */
-	public void setAnnee(int annee) {
-		this.annee = annee;
-	}
+    public Lieu getLieuTournage() {
+        return lieuTournage;
+    }
 
-	/**
-	 * @param rating the rating to set
-	 */
-	public void setRating(double rating) {
-		this.rating = rating;
-	}
+    public void setLieuTournage(Lieu lieuTournage) {
+        this.lieuTournage = lieuTournage;
+    }
 
-	/**
-	 * @param url the url to set
-	 */
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public Pays getPays() {
+        return pays;
+    }
 
-	/**
-	 * @param resume the resume to set
-	 */
-	public void setResume(String resume) {
-		this.resume = resume;
-	}
+    public void setPays(Pays pays) {
+        this.pays = pays;
+    }
 
-	/**
-	 * @param lieuTournage the lieuTournage to set
-	 */
-	public void setLieuTournage(Lieu lieuTournage) {
-		this.lieuTournage = lieuTournage;
-	}
+    public Langue getLangue() {
+        return langue;
+    }
 
-	/**
-	 * @param pays the pays to set
-	 */
-	public void setPays(Pays pays) {
-		this.pays = pays;
-	}
+    public void setLangue(Langue langue) {
+        this.langue = langue;
+    }
 
-	/**
-	 * @param langue the langue to set
-	 */
-	public void setLangue(Langue langue) {
-		this.langue = langue;
-	}
+    public Set<Genre> getGenres() {
+        return genres;
+    }
 
-	/**
-	 * @param genres the genres to set
-	 */
-	public void setGenres(Set<Genre> genres) {
-		this.genres = genres;
-	}
+    public void setGenres(Set<Genre> genres) {
+        this.genres = genres;
+    }
 
-	public static Film getFilmByIMDB(String string, EntityManager em) throws DataMissingException {
-		TypedQuery<Film> query = em.createQuery("SELECT a From Film a", Film.class);
-		List<Film> films = query.getResultList();
-		Film film = new Film();
-		for (Film item : films) {
-			if (item.getIdImdb().equals(string)) {
-				film = item;
-				em.persist(film);
-			}
-
-		}
-		if (film.getIdImdb() == null) {
-			throw new DataMissingException("no find moviez");
-		}
-		return film;
-	}
-
+    public static Film getFilmByIMDB(String idImdb, EntityManager em) throws DataMissingException {
+        TypedQuery<Film> query = em.createQuery("SELECT a FROM Film a WHERE a.idImdb = :idImdb", Film.class);
+        query.setParameter("idImdb", idImdb);
+        List<Film> films = query.getResultList();
+        if (films.isEmpty()) {
+            throw new DataMissingException("Film not found with ID: " + idImdb);
+        }
+        return films.get(0);
+    }
 }
-	

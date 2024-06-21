@@ -8,70 +8,61 @@ import java.util.Set;
 @Entity
 @Table(name = "Langue")
 public class Langue {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     private String nom;
 
-    @OneToMany(mappedBy = "langue")
+    @OneToMany(mappedBy = "langue", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Film> films = new HashSet<>();
 
     // Constructor without arguments
     public Langue() {}
 
-    // Getters and setters
-    // ...
-    
-    
-    public static Langue getLangueByName(List<Langue> langues, String string) {
-        Langue langue = new Langue();
-        for (Langue item : langues) {
-            if (item.getNom().equals(string)) {
-                langue = item;
-            }
-        }
-        return langue;
+    // Constructor with 'nom' parameter
+    public Langue(String nom) {
+        this.nom = nom;
     }
 
-	/**
-	 * @return the id
-	 */
-	public Long getId() {
-		return id;
-	}
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
 
-	/**
-	 * @return the nom
-	 */
-	public String getNom() {
-		return nom;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	/**
-	 * @return the films
-	 */
-	public Set<Film> getFilms() {
-		return films;
-	}
+    public String getNom() {
+        return nom;
+    }
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
 
-	/**
-	 * @param nom the nom to set
-	 */
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
+    public Set<Film> getFilms() {
+        return films;
+    }
 
-	/**
-	 * @param films the films to set
-	 */
-	public void setFilms(Set<Film> films) {
-		this.films = films;
-	}
+    public void setFilms(Set<Film> films) {
+        this.films = films;
+    }
+
+    // Static method to get Langue by name
+    public static Langue getLangueByName(List<Langue> langues, String name) {
+        for (Langue langue : langues) {
+            if (langue.getNom().equals(name)) {
+                return langue;
+            }
+        }
+        return null; // Return null if no match is found
+    }
+
+    @Override
+    public String toString() {
+        return "Langue [id=" + id + ", nom=" + nom + "]";
+    }
 }

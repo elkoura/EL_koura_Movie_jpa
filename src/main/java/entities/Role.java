@@ -1,22 +1,21 @@
 package entities;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
 
 @Entity
-@Table(name = "Role")
-public class Role implements Serializable {
-    @EmbeddedId
-    private RoleId id;
+@Table(name = "ROLE")
+public class Role {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("filmId")
-    @JoinColumn(name = "film_id")
+    @JoinColumn(name = "ID_FILM", nullable = false)
     private Film film;
 
     @ManyToOne
-    @MapsId("acteurId")
-    @JoinColumn(name = "acteur_id")
+    @JoinColumn(name = "ID_ACTEUR", nullable = false)
     private Acteur acteur;
 
     private String personnage;
@@ -26,7 +25,6 @@ public class Role implements Serializable {
     }
 
     public Role(Film film, Acteur acteur, String personnage) {
-        this.id = new RoleId(film.getIdImdb(), acteur.getIdImdb());
         this.film = film;
         this.acteur = acteur;
         this.personnage = personnage;
@@ -34,16 +32,11 @@ public class Role implements Serializable {
 
     // Getters and setters
 
-    @Override
-    public String toString() {
-        return "Role [id=" + id + ", film=" + film + ", acteur=" + acteur + ", personnage=" + personnage + "]";
-    }
-
-    public RoleId getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(RoleId id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -69,5 +62,10 @@ public class Role implements Serializable {
 
     public void setPersonnage(String personnage) {
         this.personnage = personnage;
+    }
+
+    @Override
+    public String toString() {
+        return "Role [id=" + id + ", personnage=" + personnage + ", film=" + film.getNom() + ", acteur=" + acteur.getIdentite() + "]";
     }
 }

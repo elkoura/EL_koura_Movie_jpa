@@ -7,7 +7,6 @@ import java.util.Set;
 @Table(name = "Film")
 public class Film {
     @Id
-
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -32,9 +31,15 @@ public class Film {
 
     @ManyToMany
     @JoinTable(name = "film_genre",
-            joinColumns = @JoinColumn(name = "film_id"),
-            inverseJoinColumns = @JoinColumn(name = "genre_id"))
+            joinColumns = @JoinColumn(name = "id_film"),
+            inverseJoinColumns = @JoinColumn(name = "id_genre"))
     private Set<Genre> genres;
+
+    @ManyToMany
+    @JoinTable(name = "film_realisateur",
+            joinColumns = @JoinColumn(name = "film_id"),
+            inverseJoinColumns = @JoinColumn(name = "realisateurId"))
+    private Set<Realisateur> realisateurs;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "langue_id")
@@ -46,6 +51,8 @@ public class Film {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pays_id")
     private Pays pays;
+
+
 
     // Getters et setters
     public Long getId() {
@@ -134,5 +141,13 @@ public class Film {
 
     public void setPays(Pays pays) {
         this.pays = pays;
+    }
+
+    public Set<Realisateur> getRealisateurs() {
+        return realisateurs;
+    }
+
+    public void setRealisateurs(Set<Realisateur> realisateurs) {
+        this.realisateurs = realisateurs;
     }
 }

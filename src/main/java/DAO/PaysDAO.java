@@ -68,7 +68,9 @@ public class PaysDAO {
         if (resultat.isEmpty()) {
             Pays pays = new Pays();
             pays.setNom(nom.trim());
-            em.getTransaction().begin();
+            if (!em.getTransaction().isActive()) {
+                em.getTransaction().begin();
+            }
             em.persist(pays);
             em.getTransaction().commit();
             return pays; // Retourne l'entité Pays créée et persistée

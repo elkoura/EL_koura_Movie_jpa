@@ -12,8 +12,11 @@ public class Genre {
     private Long id;
     private String nom;
 
-    @ManyToMany(mappedBy = "genres")
-    private Set<Film> films = new HashSet<>();
+    @ManyToMany()
+	@JoinTable(name = "film_genre",
+			joinColumns = @JoinColumn(name = "id_genre"),
+			inverseJoinColumns = @JoinColumn(name = "id_film"))
+	private Set<Film> films = new HashSet<>();
 
     // Constructor without arguments
     public Genre() {}

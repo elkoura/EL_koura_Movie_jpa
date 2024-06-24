@@ -5,11 +5,12 @@
         <class>entities.Pays</class>
         <class>entities.Film</class>
         <class>entities.Role</class>
+        <class>entities.Genre</class>
         <class>entities.FilmRealisateur</class>
 
         <!-- Ajoutez d'autres classes si nécessaire -->
         <properties>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/films"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/movies_db"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>

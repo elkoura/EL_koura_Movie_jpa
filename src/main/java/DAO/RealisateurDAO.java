@@ -7,9 +7,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 
 import java.util.List;
-import java.util.Set;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -67,21 +65,28 @@ public class RealisateurDAO {
                 // Gestion de lieuNaissance
                 String ville = values[3];
                 Lieu lieu = em.createQuery("SELECT l FROM Lieu l WHERE l.ville = :ville", Lieu.class)
-                              .setParameter("ville", ville)
-                              .getResultStream()
-                              .findFirst()
-                              .orElseGet(() -> {
-                                  Lieu newLieu = new Lieu();
-                                  newLieu.setVille(ville);
-                                  em.getTransaction().begin();
-                                  em.persist(newLieu);
-                                  em.getTransaction().commit();
-                                  return newLieu;
-                              });
+                        .setParameter("ville", ville)
+                        .getResultStream()
+                        .findFirst()
+                        .orElseGet(() -> {
+                            Lieu newLieu = new Lieu();
+                            newLieu.setVille(ville);
+                            em.getTransaction().begin();
+                            em.persist(newLieu);
+                            em.getTransaction().commit();
+                            return newLieu;
+                        });
 
                 realisateur.setLieuNaissance(lieu);
                 realisateur.setUrl(values[4]);
-                realisateursList.add(realisateur);
+
+                // Check if the realisateur with this ID already exists
+                if (!isRealInDBByImdbId(realisateursList, realisateur.getIdImdb())) {
+                    realisateursList.add(realisateur);
+                } else {
+                    // Log or handle duplicate ID scenario
+                    System.out.println("Skipping duplicate Realisateur from file: " + realisateur.getIdImdb());
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,13 +94,21 @@ public class RealisateurDAO {
         return realisateursList;
     }
 
+
     public void enregistrerRealisateurs(List<Realisateur> realisateurs) {
         em.getTransaction().begin();
         for (Realisateur realisateur : realisateurs) {
-            em.persist(realisateur);
+            // Check if the entity already exists before persisting
+            if (!isRealInDBByImdbId(extractingReal(em), realisateur.getIdImdb())) {
+                em.persist(realisateur);
+            } else {
+                // Log or handle duplicate ID scenario
+                System.out.println("Skipping duplicate Realisateur: " + realisateur.getIdImdb());
+            }
         }
         em.getTransaction().commit();
     }
+
 
     public static void setRealisateursFromList(List<String> listeReal, EntityManager em) {
         for (String ligneCourante : listeReal) {

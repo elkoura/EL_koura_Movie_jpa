@@ -1,141 +1,70 @@
 package entities;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
-@Table(name = "Lieu")
+@Table(name = "lieu")
 public class Lieu {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String ville;
-    private String detailsSup;
 
-    @ManyToOne
-    @JoinColumn(name = "PAYS_ID")
-    private Pays pays;
+	private String pays;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @OneToMany(mappedBy = "lieuTournage")
-    private Set<Film> films = new HashSet<>();
+	@Column(name = "ville")
+	private String ville;
 
-    @OneToMany(mappedBy = "lieuNaissance")
-    private Set<Acteur> acteurs = new HashSet<>();
+	// Constructeurs
+	
 
-    @OneToMany(mappedBy = "lieuNaissance")
-    private Set<Realisateur> realisateurs = new HashSet<>();
+	public Lieu(String ville, String pays) {
+		this.ville=ville;
+		this.pays=pays;
+	}
 
-    // Constructor without arguments
-    public Lieu() {}
+	public Lieu() {
 
-    // Constructor with arguments
-    public Lieu(String ville, String detailsSup, Pays pays) {
-        this.ville = ville;
-        this.detailsSup = detailsSup;
-        this.pays = pays;
-    }
+	}
 
-	/**
-	 * @return the id
-	 */
+	// Getters and Setters
 	public Long getId() {
 		return id;
 	}
 
-	/**
-	 * @return the ville
-	 */
-	public String getVille() {
-		return ville;
-	}
-
-	/**
-	 * @return the detailsSup
-	 */
-	public String getDetailsSup() {
-		return detailsSup;
-	}
-
-	/**
-	 * @return the pays
-	 */
-	public Pays getPays() {
-		return pays;
-	}
-
-	/**
-	 * @return the films
-	 */
-	public Set<Film> getFilms() {
-		return films;
-	}
-
-	/**
-	 * @return the acteurs
-	 */
-	public Set<Acteur> getActeurs() {
-		return acteurs;
-	}
-
-	/**
-	 * @return the realisateurs
-	 */
-	public Set<Realisateur> getRealisateurs() {
-		return realisateurs;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-	/**
-	 * @param ville the ville to set
-	 */
+	public String getVille() {
+		return ville;
+	}
+
 	public void setVille(String ville) {
 		this.ville = ville;
 	}
 
-	/**
-	 * @param detailsSup the detailsSup to set
-	 */
-	public void setDetailsSup(String detailsSup) {
-		this.detailsSup = detailsSup;
+	// Equals and HashCode (optional, based on your needs)
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Lieu lieu = (Lieu) o;
+
+		return id != null ? id.equals(lieu.id) : lieu.id == null;
 	}
 
-	/**
-	 * @param pays the pays to set
-	 */
-	public void setPays(Pays pays) {
-		this.pays = pays;
+	@Override
+	public int hashCode() {
+		return id != null ? id.hashCode() : 0;
 	}
 
-	/**
-	 * @param films the films to set
-	 */
-	public void setFilms(Set<Film> films) {
-		this.films = films;
+	// toString (optional, for debugging)
+	@Override
+	public String toString() {
+		return "Lieu{" +
+				"id=" + id +
+				", ville='" + ville + '\'' +
+				'}';
 	}
-
-	/**
-	 * @param acteurs the acteurs to set
-	 */
-	public void setActeurs(Set<Acteur> acteurs) {
-		this.acteurs = acteurs;
-	}
-
-	/**
-	 * @param realisateurs the realisateurs to set
-	 */
-	public void setRealisateurs(Set<Realisateur> realisateurs) {
-		this.realisateurs = realisateurs;
-	}
-
-    // Getters and setters
-    // ...
-    
-    
 }

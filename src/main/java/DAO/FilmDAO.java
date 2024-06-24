@@ -20,15 +20,16 @@ import java.util.Set;
  * Data Access Object (DAO) for managing Film entities.
  */
 public class FilmDAO {
-
     private EntityManager em;
 
-    /**
-     * Constructor for FilmDAO.
-     * @param em the EntityManager to be used for database operations.
-     */
     public FilmDAO(EntityManager em) {
         this.em = em;
+    }
+
+    public Film getFilmByImdbId(String imdbId) {
+        TypedQuery<Film> query = em.createQuery("SELECT f FROM Film f WHERE f.idImdb = :imdbId", Film.class);
+        query.setParameter("imdbId", imdbId);
+        return query.getSingleResult();
     }
 
     /**
@@ -161,33 +162,23 @@ public class FilmDAO {
         return query.getResultStream().findFirst().orElse(null);
     }
 
-    /**
-     * Finds or creates a Lieu object based on its name.
-     * @param lieuName the name of the Lieu.
-     * @return the Lieu object.
-     */
-    private Lieu findOrCreateLieu(String Ville) {
-        if (Ville == null || Ville.isEmpty()) {
+    private Lieu findOrCreateLieu(String ville) {
+        if (ville == null || ville.isEmpty()) {
             return null;
         }
-        TypedQuery<Lieu> query = em.createQuery("SELECT l FROM Lieu l WHERE l.nom = :lieuName", Lieu.class);
-        query.setParameter("lieuName", Ville);
+        TypedQuery<Lieu> query = em.createQuery("SELECT l FROM Lieu l WHERE l.ville = :villeName", Lieu.class);
+        query.setParameter("villeName", ville);
         List<Lieu> lieux = query.getResultList();
         if (!lieux.isEmpty()) {
             return lieux.get(0);
         } else {
             Lieu lieu = new Lieu();
-            lieu.setVille(Ville);
+            lieu.setVille(ville);
             em.persist(lieu);
             return lieu;
         }
     }
 
-    /**
-     * Parses a comma-separated string of genres and finds or creates Genre objects.
-     * @param genresString the comma-separated string of genres.
-     * @return a set of Genre objects.
-     */
     private Set<Genre> parseGenres(String genresString) {
         Set<Genre> genres = new HashSet<>();
         if (genresString == null || genresString.isEmpty()) {
@@ -210,11 +201,6 @@ public class FilmDAO {
         return genres;
     }
 
-    /**
-     * Finds or creates a Langue object based on its name.
-     * @param langueName the name of the Langue.
-     * @return the Langue object.
-     */
     private Langue findOrCreateLangue(String langueName) {
         if (langueName == null || langueName.isEmpty()) {
             return null;
@@ -232,11 +218,6 @@ public class FilmDAO {
         }
     }
 
-    /**
-     * Finds or creates a Pays object based on its name.
-     * @param paysName the name of the Pays.
-     * @return the Pays object.
-     */
     private Pays findOrCreatePays(String paysName) {
         if (paysName == null || paysName.isEmpty()) {
             return null;

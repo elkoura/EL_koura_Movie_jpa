@@ -1,46 +1,61 @@
 package entities;
 
 import jakarta.persistence.*;
-
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "Film")
 public class Film {
     @Id
-    private String idImdb;
-    private String nom;
-    private int annee;
-    private double rating;
 
-    @Column(name = "URL")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "idImdb", nullable = false, unique = true)
+    private String idImdb;
+
+    @Column(name = "nom")
+    private String nom;
+
+    @Column(name = "annee")
+    private Integer annee;
+
+    @Column(name = "rating")
+    private Double rating;
+
+    @Column(name = "url")
     private String url;
 
-    @Column(length = 1024)
-    private String resume;
-
-    @ManyToOne
-    @JoinColumn(name = "LIEU_TOURNAGE_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lieuTournage_id")
     private Lieu lieuTournage;
 
-    @ManyToOne
-    @JoinColumn(name = "PAYS_ID")
-    private Pays pays;
+    @ManyToMany
+    @JoinTable(name = "film_genre",
+            joinColumns = @JoinColumn(name = "film_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    private Set<Genre> genres;
 
-    @ManyToOne
-    @JoinColumn(name = "LANGUE_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "langue_id")
     private Langue langue;
 
-    @ManyToMany
-    @JoinTable(name = "Film_Genre", joinColumns = @JoinColumn(name = "FILM_ID"), inverseJoinColumns = @JoinColumn(name = "GENRE_ID"))
-    private Set<Genre> genres = new HashSet<>();
+    @Column(name = "resume", columnDefinition = "TEXT")
+    private String resume;
 
-    // Constructeur sans arguments
-    public Film() {}
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pays_id")
+    private Pays pays;
 
     // Getters et setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getIdImdb() {
         return idImdb;
     }
@@ -57,19 +72,19 @@ public class Film {
         this.nom = nom;
     }
 
-    public int getAnnee() {
+    public Integer getAnnee() {
         return annee;
     }
 
-    public void setAnnee(int annee) {
+    public void setAnnee(Integer annee) {
         this.annee = annee;
     }
 
-    public double getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 
@@ -81,36 +96,12 @@ public class Film {
         this.url = url;
     }
 
-    public String getResume() {
-        return resume;
-    }
-
-    public void setResume(String resume) {
-        this.resume = resume;
-    }
-
     public Lieu getLieuTournage() {
         return lieuTournage;
     }
 
     public void setLieuTournage(Lieu lieuTournage) {
         this.lieuTournage = lieuTournage;
-    }
-
-    public Pays getPays() {
-        return pays;
-    }
-
-    public void setPays(Pays pays) {
-        this.pays = pays;
-    }
-
-    public Langue getLangue() {
-        return langue;
-    }
-
-    public void setLangue(Langue langue) {
-        this.langue = langue;
     }
 
     public Set<Genre> getGenres() {
@@ -121,13 +112,27 @@ public class Film {
         this.genres = genres;
     }
 
-    public static Film getFilmByIMDB(String idImdb, EntityManager em) throws DataMissingException {
-        TypedQuery<Film> query = em.createQuery("SELECT a FROM Film a WHERE a.idImdb = :idImdb", Film.class);
-        query.setParameter("idImdb", idImdb);
-        List<Film> films = query.getResultList();
-        if (films.isEmpty()) {
-            throw new DataMissingException("Film not found with ID: " + idImdb);
-        }
-        return films.get(0);
+    public Langue getLangue() {
+        return langue;
+    }
+
+    public void setLangue(Langue langue) {
+        this.langue = langue;
+    }
+
+    public String getResume() {
+        return resume;
+    }
+
+    public void setResume(String resume) {
+        this.resume = resume;
+    }
+
+    public Pays getPays() {
+        return pays;
+    }
+
+    public void setPays(Pays pays) {
+        this.pays = pays;
     }
 }

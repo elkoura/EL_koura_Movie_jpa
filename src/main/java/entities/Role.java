@@ -5,32 +5,31 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "ROLE")
 public class Role {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "ID_FILM", nullable = false)
-    private Film film;
-
-    @ManyToOne
-    @JoinColumn(name = "ID_ACTEUR", nullable = false)
+    @JoinColumn(name = "id_acteur")
     private Acteur acteur;
 
+    @ManyToOne
+    @JoinColumn(name = "id_film") // Assurez-vous que le nom de la colonne est correct
+    private Film film;
+
+    @Column(name = "personnage") // Définir le nom de la colonne pour le personnage
     private String personnage;
 
     public Role() {
-        // Default constructor
     }
 
-    public Role(Film film, Acteur acteur, String personnage) {
-        this.film = film;
+    public Role(Acteur acteur, Film film, String personnage) {
         this.acteur = acteur;
+        this.film = film;
         this.personnage = personnage;
     }
-
-    // Getters and setters
 
     public Long getId() {
         return id;
@@ -40,20 +39,20 @@ public class Role {
         this.id = id;
     }
 
-    public Film getFilm() {
-        return film;
-    }
-
-    public void setFilm(Film film) {
-        this.film = film;
-    }
-
     public Acteur getActeur() {
         return acteur;
     }
 
     public void setActeur(Acteur acteur) {
         this.acteur = acteur;
+    }
+
+    public Film getFilm() {
+        return film;
+    }
+
+    public void setFilm(Film film) {
+        this.film = film;
     }
 
     public String getPersonnage() {
@@ -66,6 +65,11 @@ public class Role {
 
     @Override
     public String toString() {
-        return "Role [id=" + id + ", personnage=" + personnage + ", film=" + film.getNom() + ", acteur=" + acteur.getIdentite() + "]";
+        return "Role{" +
+                "id=" + id +
+                ", acteur=" + acteur +
+                ", film=" + film +
+                ", personnage='" + personnage + '\'' +
+                '}';
     }
 }

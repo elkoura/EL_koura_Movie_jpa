@@ -1,10 +1,8 @@
 package DAO;
 
 import entities.Acteur;
-import entities.DataMissingException;
 import entities.Film;
 import entities.Role;
-import entities.RoleId;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 
@@ -12,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class RoleDAO {
@@ -27,10 +24,6 @@ public class RoleDAO {
         em.getTransaction().begin();
         em.persist(role);
         em.getTransaction().commit();
-    }
-
-    public Role findById(RoleId id) {
-        return em.find(Role.class, id);
     }
 
     public List<Role> findAll() {
@@ -56,19 +49,22 @@ public class RoleDAO {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty() || line.startsWith("FILM;ID ACTEUR;PERSONNAGE")) {
-                    continue; // Skip header or empty lines
+                    continue;
                 }
 
                 String[] values = line.split(";");
                 if (values.length < 3) {
-                    continue; // Skip lines with insufficient data
+                    continue;
                 }
 
-                RoleId roleId = new RoleId(values[0], values[1]);
+                Film film = findOrCreateFilm(values[0]);
+                Acteur acteur = findOrCreateActeur(values[1]);
 
                 Role role = new Role();
-                role.setId(roleId);
+                role.setFilm(film);
+                role.setActeur(acteur);
                 role.setPersonnage(values[2]);
+
                 rolesList.add(role);
             }
         } catch (IOException e) {
@@ -77,16 +73,12 @@ public class RoleDAO {
         return rolesList;
     }
 
-    public void insererRoles(List<Role> roles) throws DataMissingException {
+    public void insererRoles(List<Role> roles) {
         em.getTransaction().begin();
         try {
             for (Role role : roles) {
                 if (!isRoleInDB(role)) {
-                    Film film = FilmDAO.getFilmByImdbId(role.getId().getFilmId(), em);
-					Acteur acteur = ActeurDAO.getActeurByIMDB(role.getId().getActeurId(), em);
-					role.setFilm(film);
-					role.setActeur(acteur);
-					em.persist(role);
+                    em.persist(role);
                 }
             }
             em.getTransaction().commit();
@@ -98,45 +90,39 @@ public class RoleDAO {
 
     private boolean isRoleInDB(Role role) {
         TypedQuery<Role> query = em.createQuery(
-                "SELECT r FROM Role r WHERE r.id.filmId = :filmId AND r.id.acteurId = :acteurId AND r.personnage = :personnage",
+                "SELECT r FROM Role r WHERE r.film.idImdb = :filmId AND r.acteur.idImdb = :acteurId AND r.personnage = :personnage",
                 Role.class);
-        query.setParameter("filmId", role.getId().getFilmId());
-        query.setParameter("acteurId", role.getId().getActeurId());
+        query.setParameter("filmId", role.getFilm().getIdImdb());
+        query.setParameter("acteurId", role.getActeur().getIdImdb());
         query.setParameter("personnage", role.getPersonnage());
         return !query.getResultList().isEmpty();
     }
 
-    public static List<Role> extractingRoles(EntityManager em) {
-        TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r", Role.class);
-        return query.getResultList();
-    }
-
-    public static boolean isRoleInDB(List<Role> roles, String[] tab) {
-        for (Role item : roles) {
-            if (item.getActeur().getIdImdb().equals(tab[1]) && item.getFilm().getIdImdb().equals(tab[0])
-                    && item.getPersonnage().equals(tab[2])) {
-                return true;
-            }
+    private Film findOrCreateFilm(String idImdb) {
+        TypedQuery<Film> query = em.createQuery("SELECT f FROM Film f WHERE f.idImdb = :idImdb", Film.class);
+        query.setParameter("idImdb", idImdb);
+        List<Film> films = query.getResultList();
+        if (!films.isEmpty()) {
+            return films.get(0);
+        } else {
+            Film film = new Film();
+            film.setIdImdb(idImdb);
+            em.persist(film);
+            return film;
         }
-        return false;
     }
 
-    public static void setRolesFromList(List<String> listeRoles, EntityManager em) {
-        Iterator<String> iterator = listeRoles.iterator();
-        while (iterator.hasNext()) {
-            String ligneCourante = iterator.next();
-            String[] tab = ligneCourante.split(";", -1);
-            List<Role> roles = extractingRoles(em);
-            if (!isRoleInDB(roles, tab)) {
-                try {
-                    Film film = FilmDAO.getFilmByImdbId(tab[0], em);
-                    Acteur acteur = ActeurDAO.getActeurByIMDB(tab[1], em);
-                    Role role = new Role(film, acteur, tab[2]);
-                    em.persist(role);
-                } catch (DataMissingException e) {
-                    e.printStackTrace();
-                }
-            }
+    private Acteur findOrCreateActeur(String idImdb) {
+        TypedQuery<Acteur> query = em.createQuery("SELECT a FROM Acteur a WHERE a.idImdb = :idImdb", Acteur.class);
+        query.setParameter("idImdb", idImdb);
+        List<Acteur> acteurs = query.getResultList();
+        if (!acteurs.isEmpty()) {
+            return acteurs.get(0);
+        } else {
+            Acteur acteur = new Acteur();
+            acteur.setIdImdb(idImdb);
+            em.persist(acteur);
+            return acteur;
         }
     }
 }
